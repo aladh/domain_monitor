@@ -9,7 +9,7 @@ import java.net.URL
 private data class RdapServiceList(val services: List<List<List<String>>>)
 
 private const val BOOTSTRAP_URL = "https://data.iana.org/rdap/dns.json"
-private val json = Json { ignoreUnknownKeys = true }
+private val serializer = Json { ignoreUnknownKeys = true }
 
 object RdapRegistry {
     @Serializable
@@ -28,13 +28,13 @@ object RdapRegistry {
     private val serviceList: RdapServiceList by lazy {
         URL(BOOTSTRAP_URL)
             .readText()
-            .let { json.decodeFromString<RdapServiceList>(it) }
+            .let { serializer.decodeFromString<RdapServiceList>(it) }
     }
 
     fun lookup(name: String, tld: String): RdapResponse? = try {
         URL("${serviceForTLD(tld)}domain/$name")
             .readText()
-            .let { json.decodeFromString<RdapResponse>(it) }
+            .let { serializer.decodeFromString<RdapResponse>(it) }
     } catch (e: FileNotFoundException) {
         null
     }
