@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JsonNames
 @Serializable
 private data class ServiceList(private val services: List<List<List<String>>>) {
     fun serviceForTLD(tld: String): String? =
-        services.find { it[0][0] == tld }?.get(1)?.get(0)
+        services.find { it[0].contains(tld) }?.get(1)?.get(0)
 }
 
 private const val BOOTSTRAP_URL = "https://data.iana.org/rdap/dns.json"
