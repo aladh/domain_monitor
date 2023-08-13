@@ -1,45 +1,41 @@
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNames
-import java.io.FileNotFoundException
-import java.net.URL
 
 @Serializable
-private data class RdapServiceList(val services: List<List<List<String>>>)
+private data class ServiceList(private val services: List<List<List<String>>>) {
+    fun serviceForTLD(tld: String): String? =
+        services.find { it[0][0] == tld }?.get(1)?.get(0)
+}
 
 private const val BOOTSTRAP_URL = "https://data.iana.org/rdap/dns.json"
-private val serializer = Json { ignoreUnknownKeys = true }
 
 object RdapRegistry {
     @Serializable
-    data class RdapResponse(val events: List<RdapEvent>) {
+    data class Response(private val events: List<Event>) {
         @OptIn(ExperimentalSerializationApi::class)
         @Serializable
-        data class RdapEvent(@JsonNames("eventAction") val action: String, @JsonNames("eventDate") val date: String) {
+        data class Event(@JsonNames("eventAction") val action: String, @JsonNames("eventDate") val date: String) {
             companion object {
                 const val EXPIRATION_ACTION = "expiration"
             }
         }
 
-        val expirationDate: String? = events.find { it.action == RdapEvent.EXPIRATION_ACTION }?.date
+        val expirationDate: String?
+            get() = events.find { it.action == Event.EXPIRATION_ACTION }?.date
     }
 
-    private val serviceList: RdapServiceList by lazy {
-        URL(BOOTSTRAP_URL)
-            .readText()
-            .let { serializer.decodeFromString<RdapServiceList>(it) }
-    }
+    private lateinit var serviceList: ServiceList
 
-    fun lookup(name: String, tld: String): RdapResponse? = try {
-        URL("${serviceForTLD(tld)}domain/$name")
-            .readText()
-            .let { serializer.decodeFromString<RdapResponse>(it) }
-    } catch (e: FileNotFoundException) {
-        null
-    }
+    suspend fun lookup(name: String, tld: String): Response? =
+        client.get("${serviceList.serviceForTLD(tld)}domain/$name").let {
+            if (it.status.value == HttpStatusCode.OK.value) it.body() else null
+        }
 
-    private fun serviceForTLD(tld: String): String? {
-        return serviceList.services.find { it[0][0] == tld }?.get(1)?.get(0)
+    suspend fun loadServiceList() {
+        serviceList = client.get(BOOTSTRAP_URL).body()
     }
 }
