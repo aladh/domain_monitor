@@ -1,0 +1,12 @@
+stages:
+  - run
+
+monitor_domains:
+  stage: run
+  image: eclipse-temurin:17-jdk
+  before_script:
+    - ./gradlew build
+  script:
+    - java -jar build/libs/domain_monitor-1.0-SNAPSHOT.jar $DOMAINS
+  only:
+    - schedules
