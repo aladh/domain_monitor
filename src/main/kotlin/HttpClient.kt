@@ -13,8 +13,5 @@ val client = HttpClient(CIO) {
     CurlUserAgent()
     install(ContentNegotiation) { json(serializer) }
     install(HttpTimeout) { requestTimeoutMillis = 5000 }
-    install(HttpRequestRetry) {
-        maxRetries = 3
-        exponentialDelay()
-    }
+    install(HttpRequestRetry)
 }

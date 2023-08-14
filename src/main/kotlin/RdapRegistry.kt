@@ -1,4 +1,5 @@
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -36,6 +37,8 @@ object RdapRegistry {
         }
 
     suspend fun loadServiceList() {
-        serviceList = client.get(BOOTSTRAP_URL).body()
+        serviceList = client.get(BOOTSTRAP_URL) {
+            expectSuccess = true
+        }.body()
     }
 }
