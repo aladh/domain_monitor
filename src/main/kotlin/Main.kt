@@ -1,5 +1,6 @@
 import kotlinx.coroutines.delay
 import java.util.Date
+import kotlin.time.Duration.Companion.days
 
 private const val DOMAIN_DELIMITER = ","
 
@@ -14,6 +15,8 @@ suspend fun main(args: Array<String>) {
                 ?.let { date ->
                     if (date.before(Date())) {
                         printAndNotify("${domain.name} has expired.")
+                    } else if (date.before(Date(System.currentTimeMillis() + 30.days.inWholeMilliseconds))) {
+                        printAndNotify("${domain.name} expires in less than 30 days on $date.")
                     } else {
                         println("${domain.name} expires on $date.")
                     }
