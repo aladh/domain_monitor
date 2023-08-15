@@ -14,7 +14,7 @@ suspend fun main(args: Array<String>) {
             domain.expirationDate()
                 ?.let { date ->
                     if (date.before(Date())) {
-                        printAndNotify("${domain.name} has expired.")
+                        printAndNotify("${domain.name} expired on $date.")
                     } else if (date.before(Date(System.currentTimeMillis() + 30.days.inWholeMilliseconds))) {
                         printAndNotify("${domain.name} expires in less than 30 days on $date.")
                     } else {
