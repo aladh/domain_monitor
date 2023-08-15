@@ -9,7 +9,7 @@ private val WEBHOOK_URL: String = System.getenv("WEBHOOK_URL").also {
 @Serializable
 private data class Payload(val content: String)
 
-object Notifier {
+object WebhookNotifier {
     suspend fun send(message: String) {
         client.post(WEBHOOK_URL) {
             expectSuccess = true

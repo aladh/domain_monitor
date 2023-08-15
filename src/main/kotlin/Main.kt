@@ -25,5 +25,5 @@ suspend fun main(args: Array<String>) {
 
 private suspend fun printAndNotify(message: String) {
     println(message)
-    Notifier.send(message)
+    WebhookNotifier.send(message)
 }
