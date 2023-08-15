@@ -9,9 +9,9 @@ import kotlinx.serialization.json.Json
 private val serializer = Json { ignoreUnknownKeys = true }
 
 val client = HttpClient(CIO) {
-    install(DefaultRequest) { contentType(ContentType.Application.Json) }
-    CurlUserAgent()
-    install(ContentNegotiation) { json(serializer) }
-    install(HttpTimeout) { requestTimeoutMillis = 5000 }
-    install(HttpRequestRetry)
+  install(DefaultRequest) { contentType(ContentType.Application.Json) }
+  CurlUserAgent()
+  install(ContentNegotiation) { json(serializer) }
+  install(HttpTimeout) { requestTimeoutMillis = 5000 }
+  install(HttpRequestRetry)
 }
