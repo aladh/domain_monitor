@@ -1,14 +1,13 @@
 import kotlinx.coroutines.delay
+import java.io.File
 import java.util.*
 import kotlin.time.Duration.Companion.days
-
-private const val DOMAIN_DELIMITER = ","
 
 suspend fun main(args: Array<String>) {
   RdapRegistry.loadServiceList()
 
-  args[0]
-    .split(DOMAIN_DELIMITER)
+  File(args[0])
+    .readLines()
     .map { Domain(it) }
     .forEach { domain ->
       domain.expirationDate()
