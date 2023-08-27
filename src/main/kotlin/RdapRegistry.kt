@@ -2,6 +2,7 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
@@ -29,15 +30,15 @@ object RdapRegistry {
       get() = events.find { it.action == Event.EXPIRATION_ACTION }?.date
   }
 
-  private lateinit var serviceList: ServiceList
+  private val serviceList by lazy { loadServiceList() }
 
   suspend fun lookup(name: String, tld: String): Response? =
     client.get("${serviceList.serviceForTLD(tld)}domain/$name").let {
       if (it.status.value == HttpStatusCode.OK.value) it.body() else null
     }
 
-  suspend fun loadServiceList() {
-    serviceList = client.get(BOOTSTRAP_URL) {
+  private fun loadServiceList(): ServiceList = runBlocking {
+    client.get(BOOTSTRAP_URL) {
       expectSuccess = true
     }.body()
   }

@@ -4,8 +4,6 @@ import java.util.*
 import kotlin.time.Duration.Companion.days
 
 suspend fun main(args: Array<String>) {
-  RdapRegistry.loadServiceList()
-
   File(args[0])
     .readLines()
     .map { Domain(it) }
