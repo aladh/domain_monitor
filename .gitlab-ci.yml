@@ -3,7 +3,7 @@ stages:
 
 monitor_domains:
   stage: run
-  image: eclipse-temurin:17-jdk
+  image: eclipse-temurin:21-jdk
   script:
     - ./gradlew run --no-daemon --args $DOMAINS
   only:
